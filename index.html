@@ -479,41 +479,98 @@
   .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--ink); }
   .btn-secondary:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
 
-  .animal-select {
-    width: 104px;
-    height: 62px;
+  .animal-picker {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 9px;
+    max-height: 252px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(255,255,255,0.68);
+    border: 2px solid rgba(31, 58, 95, 0.18);
+    border-radius: 18px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(31, 58, 95, 0.45) transparent;
+  }
+  .animal-picker::-webkit-scrollbar {
+    width: 8px;
+  }
+  .animal-picker::-webkit-scrollbar-thumb {
+    background: rgba(31, 58, 95, 0.38);
+    border-radius: 999px;
+  }
+  .animal-choice {
+    position: relative;
+    min-width: 0;
+    aspect-ratio: 1;
+    border: 2px solid rgba(31, 58, 95, 0.2);
+    border-radius: 16px;
     background: #fff;
-    border: 3px solid var(--ink);
-    border-radius: 14px;
-    padding: 6px 34px 6px 10px;
-    font-family: 'Fredoka', sans-serif;
-    font-size: 32px;
+    display: grid;
+    place-items: center;
+    font-size: clamp(30px, 4vw, 38px);
     line-height: 1;
-    color: var(--ink);
     cursor: pointer;
-    box-shadow: 0 4px 0 var(--ink);
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'><path fill='%231f3a5f' d='M2 5l5 5 5-5z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    text-align: center;
-    text-align-last: center;
+    box-shadow: 0 3px 0 rgba(31, 58, 95, 0.22);
+    transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s, background 0.12s;
+    user-select: none;
+    -webkit-user-select: none;
   }
-  .animal-select option {
-    font-size: 28px;
-    text-align: center;
+  .animal-choice:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 rgba(31, 58, 95, 0.24);
+    border-color: rgba(31, 58, 95, 0.45);
   }
-  .animal-select:focus {
-    outline: none;
+  .animal-choice:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 0 rgba(31, 58, 95, 0.24);
+  }
+  .animal-choice:focus-visible {
+    outline: 3px solid #ff8a3d;
+    outline-offset: 2px;
+  }
+  .animal-choice.selected {
+    background: #fff3e7;
+    border-color: #e8470c;
+    box-shadow: 0 4px 0 #e8470c;
     transform: translateY(-1px);
-    box-shadow: 0 5px 0 var(--ink);
+  }
+  .animal-choice.selected::after {
+    content: '✓';
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--ink);
+    color: #fff;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .animal-picker-help {
+    margin-top: 7px;
+    color: var(--ink-soft);
+    font-size: 12px;
   }
 
   @media (max-width: 720px) {
     .num { width: 58px; height: 58px; font-size: 28px; }
     .logo { font-size: 28px; }
     .pill { font-size: 15px; padding: 6px 12px; }
+    .animal-picker { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 440px) {
+    .animal-picker {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      max-height: 228px;
+    }
+    .animal-choice { border-radius: 14px; }
   }
 
   /* Yatay mod / kısa ekranlar — yüksekliğe göre sıkıştır */
@@ -578,8 +635,9 @@
     <h2>Oyun Ayarları</h2>
 
     <div class="setting">
-      <label>Hangi hayvan?</label>
-      <select id="animalSelect" class="animal-select"></select>
+      <label id="animalPickerLabel">Hayvanını seç</label>
+      <div class="animal-picker" id="animalPicker" role="radiogroup" aria-labelledby="animalPickerLabel"></div>
+      <div class="animal-picker-help">Bir hayvana dokun — seçili hayvan turuncu çerçeveyle gösterilir.</div>
     </div>
 
     <div class="setting">
@@ -878,21 +936,54 @@
     }
   }
 
+  function syncAnimalPicker() {
+    document.querySelectorAll('.animal-choice').forEach(btn => {
+      const selected = btn.dataset.animal === settings.animal;
+      btn.classList.toggle('selected', selected);
+      btn.setAttribute('aria-checked', selected ? 'true' : 'false');
+      btn.tabIndex = selected ? 0 : -1;
+    });
+  }
+
   function buildAnimalPicker() {
-    const sel = $('#animalSelect');
-    sel.innerHTML = '';
+    const picker = $('#animalPicker');
+    picker.innerHTML = '';
+
     ANIMALS.forEach(a => {
-      const opt = document.createElement('option');
-      opt.value = a.key;
-      opt.textContent = a.emoji;
-      opt.title = a.name;
-      opt.setAttribute('aria-label', a.name);
-      if (a.key === settings.animal) opt.selected = true;
-      sel.appendChild(opt);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'animal-choice';
+      btn.dataset.animal = a.key;
+      btn.textContent = a.emoji;
+      btn.title = a.name;
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-label', a.name);
+      btn.setAttribute('aria-checked', 'false');
+
+      btn.addEventListener('click', () => {
+        settings.animal = a.key;
+        syncAnimalPicker();
+      });
+
+      btn.addEventListener('keydown', e => {
+        if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
+        e.preventDefault();
+
+        const buttons = [...picker.querySelectorAll('.animal-choice')];
+        const current = buttons.indexOf(btn);
+        const columns = getComputedStyle(picker).gridTemplateColumns.split(' ').length;
+        const delta = e.key === 'ArrowRight' ? 1
+          : e.key === 'ArrowLeft' ? -1
+          : e.key === 'ArrowDown' ? columns
+          : -columns;
+        const next = Math.max(0, Math.min(buttons.length - 1, current + delta));
+        buttons[next].focus();
+      });
+
+      picker.appendChild(btn);
     });
-    sel.addEventListener('change', e => {
-      settings.animal = e.target.value;
-    });
+
+    syncAnimalPicker();
   }
 
   function openSettings() {
@@ -905,7 +996,7 @@
     $('#layoutSeg').querySelectorAll('button').forEach(b => {
       b.classList.toggle('active', b.dataset.v === settings.layout);
     });
-    $('#animalSelect').value = settings.animal;
+    syncAnimalPicker();
     $('#modalBg').classList.add('show');
   }
 
