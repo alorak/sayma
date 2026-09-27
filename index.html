@@ -686,6 +686,9 @@
     { key: 'blowfish',  emoji: '🐡', name: 'balon balığı' },
     { key: 'seal',      emoji: '🦭', name: 'fok' },
     { key: 'turtle',    emoji: '🐢', name: 'kaplumbağa' },
+    { key: 'crocodile', emoji: '🐊', name: 'timsah' },
+    { key: 'lizard',    emoji: '🦎', name: 'kertenkele' },
+    { key: 'snake',     emoji: '🐍', name: 'yılan' },
     { key: 'frog',      emoji: '🐸', name: 'kurbağa' },
     { key: 'bee',       emoji: '🐝', name: 'arı' },
     { key: 'butterfly', emoji: '🦋', name: 'kelebek' },
@@ -882,8 +885,8 @@
       const opt = document.createElement('option');
       opt.value = a.key;
       opt.textContent = a.emoji;
-      opt.label = a.name;
       opt.title = a.name;
+      opt.setAttribute('aria-label', a.name);
       if (a.key === settings.animal) opt.selected = true;
       sel.appendChild(opt);
     });
