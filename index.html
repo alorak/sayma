@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hayvanları Sayalım — Toplama Oyunu</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sky-1: #b6e2ff;
+    --sky-2: #7fc4ff;
+    --sky-3: #4ea8e6;
+    --balloon: #9ed4f5;
+    --cloud: #ffffff;
+    --sun: #ffd84a;
+    --grass: #7dc66a;
+    --grass-deep: #4a9b3d;
+    --ink: #1f3a5f;
+    --ink-soft: #4b6789;
+    --correct: #34c759;
+    --wrong: #ff5a5a;
+    --paper: #fffaf0;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Fredoka', system-ui, sans-serif;
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  html {
+    background:
+      linear-gradient(180deg, var(--grass) 0%, var(--grass-deep) 100%) bottom / 100% 22% no-repeat,
+      linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 60%, var(--sky-3) 100%) top / 100% 78% no-repeat,
+      var(--grass-deep);
+    background-attachment: fixed;
+  }
+
+  body {
+    min-height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stage {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .numpad {
+    margin-top: auto;
+  }
+
+  .cloud {
+    position: absolute;
+    background: var(--cloud);
+    border-radius: 100px;
+    opacity: 0.85;
+    animation: drift linear infinite;
+  }
+  .cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: var(--cloud);
+    border-radius: 50%;
+  }
+  .cloud.c1 { width: 120px; height: 30px; top: 8%; left: -150px; animation-duration: 60s; }
+  .cloud.c1::before { width: 50px; height: 50px; top: -22px; left: 18px; }
+  .cloud.c1::after  { width: 70px; height: 70px; top: -38px; left: 50px; }
+  .cloud.c2 { width: 90px; height: 22px; top: 18%; left: -120px; animation-duration: 80s; animation-delay: -20s; }
+  .cloud.c2::before { width: 40px; height: 40px; top: -18px; left: 10px; }
+  .cloud.c2::after  { width: 55px; height: 55px; top: -28px; left: 38px; }
+  .cloud.c3 { width: 140px; height: 32px; top: 4%; left: -180px; animation-duration: 100s; animation-delay: -50s; }
+  .cloud.c3::before { width: 60px; height: 60px; top: -28px; left: 22px; }
+  .cloud.c3::after  { width: 80px; height: 80px; top: -45px; left: 60px; }
+
+  @keyframes drift {
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(100vw + 250px)); }
+  }
+
+  .sun {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: var(--sun);
+    box-shadow: 0 0 60px rgba(255, 216, 74, 0.6);
+    z-index: 1;
+  }
+
+  .topbar {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 28px;
+  }
+
+  .logo {
+    font-family: 'Caveat', cursive;
+    font-size: 38px;
+    font-weight: 700;
+    color: var(--ink);
+    text-shadow: 2px 2px 0 #fff, 4px 4px 0 rgba(0,0,0,0.08);
+  }
+  .logo .em { color: #e8470c; }
+
+  .scorebar { display: flex; gap: 12px; align-items: center; }
+  .pill {
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-weight: 600;
+    font-size: 18px;
+    box-shadow: 0 4px 0 var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pill.correct { background: #e8fae3; }
+  .pill.wrong { background: #ffe5e5; }
+
+  .icon-btn {
+    background: #fff;
+    border: 3px solid var(--ink);
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--ink);
+    transition: transform 0.12s, box-shadow 0.12s;
+    font-size: 22px;
+  }
+  .icon-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--ink); }
+  .icon-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--ink); }
+
+  .question {
+    text-align: center;
+    font-family: 'Caveat', cursive;
+    font-size: 44px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 8px 0 4px;
+    text-shadow: 2px 2px 0 #fff;
+    position: relative;
+    z-index: 4;
+  }
+
+  .stage {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 4px 16px;
+    flex-wrap: wrap;
+  }
+
+  .balloon {
+    /* Genişlik VE yükseklik bazlı: hangi sınır küçükse o kazanır */
+    width: min(320px, 38vw, 55vh);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--balloon);
+    border: 4px solid #ffffff;
+    box-shadow: 0 12px 30px rgba(31, 58, 95, 0.25);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bird-grid {
+    position: absolute;
+    inset: 10%;
+    container-type: size;
+  }
+
+  .bird {
+    position: absolute;
+    /* Balon boyutuna oranlı: balon küçülünce emoji de küçülür */
+    font-size: clamp(20px, 28cqmin, 56px);
+    line-height: 1;
+    animation: popIn 0.4s ease-out backwards;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .numpad {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 16px 22px;
+  }
+
+  .num {
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    border: 3px solid var(--ink);
+    background: linear-gradient(180deg, #5da9e8, #3d86c2);
+    color: #fff;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 0 var(--ink);
+    transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
+    text-shadow: 0 2px 0 rgba(0,0,0,0.15);
+  }
+  .num:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 0 var(--ink);
+  }
+  .num:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 var(--ink);
+  }
+  .num.correct {
+    background: linear-gradient(180deg, #5fdc77, #2ea84a);
+    animation: correctPulse 0.6s ease-out;
+  }
+  .num.wrong {
+    background: linear-gradient(180deg, #ff7a7a, #e23535);
+    animation: shake 0.4s;
+  }
+  .num:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  @keyframes correctPulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+
+  .num.num-refresh {
+    background: linear-gradient(180deg, #ff8a3d, #e8470c);
+    margin-left: 8px;
+    font-size: 22px;
+  }
+  .num.num-refresh:disabled {
+    opacity: 1; /* Yenile butonu hiç devre dışı kalmasın */
+    cursor: pointer;
+  }
+
+  .feedback {
+    position: fixed;
+    top: 18%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-family: 'Caveat', cursive;
+    font-size: clamp(48px, 9vw, 88px);
+    font-weight: 700;
+    pointer-events: none;
+    z-index: 50;
+    padding: 12px 36px;
+    border-radius: 999px;
+    background: #fff;
+    border: 4px solid var(--ink);
+    box-shadow: 0 8px 0 var(--ink), 0 16px 30px rgba(0,0,0,0.2);
+    white-space: nowrap;
+    transition: transform 0.4s cubic-bezier(.34,1.56,.64,1), opacity 0.4s;
+    opacity: 0;
+  }
+  .feedback.show { transform: translate(-50%, -50%) scale(1) rotate(-4deg); opacity: 1; }
+  .feedback.good { color: var(--correct); background: #e8fae3; }
+  .feedback.bad  { color: var(--wrong); background: #ffe5e5; }
+
+  .confetti {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 40;
+    overflow: hidden;
+  }
+  .confetti span {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    top: -20px;
+    animation: fall linear forwards;
+  }
+  @keyframes fall {
+    to {
+      transform: translateY(110vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(31, 58, 95, 0.55);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-bg.show { display: flex; animation: fadeIn 0.25s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background: var(--paper);
+    border: 4px solid var(--ink);
+    border-radius: 24px;
+    padding: 28px 32px;
+    max-width: 520px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 12px 0 var(--ink), 0 30px 60px rgba(0,0,0,0.3);
+    animation: pop 0.35s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes pop {
+    from { transform: scale(0.8) translateY(20px); opacity: 0; }
+    to   { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  .modal h2 {
+    font-family: 'Caveat', cursive;
+    font-size: 42px;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .modal p.sub { color: var(--ink-soft); margin-bottom: 20px; font-size: 15px; }
+
+  .setting { margin-bottom: 20px; }
+  .setting label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 17px;
+  }
+  .setting label .val {
+    background: var(--ink);
+    color: #fff;
+    padding: 2px 12px;
+    border-radius: 999px;
+    font-size: 15px;
+    margin-left: 8px;
+  }
+  .setting input[type=range] {
+    width: 100%;
+    accent-color: #3d86c2;
+    height: 6px;
+  }
+  .setting .hint {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 4px;
+  }
+
+  .seg {
+    display: flex;
+    gap: 6px;
+    background: #e9e0c8;
+    padding: 5px;
+    border-radius: 14px;
+    border: 2px solid var(--ink);
+  }
+  .seg button {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    cursor: pointer;
+    border-radius: 10px;
+    color: var(--ink);
+    transition: all 0.15s;
+  }
+  .seg button.active {
+    background: var(--ink);
+    color: #fff;
+  }
+
+  .modal .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .btn-primary {
+    flex: 1;
+    background: linear-gradient(180deg, #ff8a3d, #e8470c);
+    color: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 14px;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 var(--ink);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--ink); }
+  .btn-primary:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
+
+  .btn-secondary {
+    flex: 1;
+    background: #fff;
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 14px;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 var(--ink);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--ink); }
+  .btn-secondary:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
+
+  .animal-select {
+    width: 100%;
+    background: #fff;
+    border: 3px solid var(--ink);
+    border-radius: 14px;
+    padding: 12px 16px;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--ink);
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'><path fill='%231f3a5f' d='M2 5l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 42px;
+  }
+  .animal-select:focus {
+    outline: none;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 0 var(--ink);
+  }
+
+  @media (max-width: 720px) {
+    .num { width: 44px; height: 44px; font-size: 20px; }
+    .logo { font-size: 28px; }
+    .pill { font-size: 15px; padding: 6px 12px; }
+  }
+
+  /* Yatay mod / kısa ekranlar — yüksekliğe göre sıkıştır */
+  @media (max-height: 600px) {
+    .topbar { padding: 8px 16px; }
+    .logo { font-size: 26px; }
+    .pill { font-size: 14px; padding: 5px 12px; }
+    .icon-btn { width: 40px; height: 40px; font-size: 18px; }
+    .stage { gap: 14px; padding-top: 0; }
+    .numpad { padding: 8px 16px 12px; gap: 6px; }
+    .num { width: 42px; height: 42px; font-size: 18px; }
+  }
+
+  @media (max-height: 480px) {
+    .topbar { padding: 6px 14px; }
+    .stage { gap: 10px; }
+    .numpad { padding: 6px 12px 10px; gap: 5px; }
+    .num { width: 36px; height: 36px; font-size: 16px; border-width: 2px; box-shadow: 0 3px 0 var(--ink); }
+    .pill { font-size: 13px; padding: 4px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sun"></div>
+<div class="cloud c1"></div>
+<div class="cloud c2"></div>
+<div class="cloud c3"></div>
+
+<div class="topbar">
+  <div class="logo">Hayvanları <span class="em">Sayalım!</span></div>
+  <div class="scorebar">
+    <div class="pill correct">✅ <span id="scoreCorrect">0</span></div>
+    <div class="pill wrong">❌ <span id="scoreWrong">0</span></div>
+    <button class="icon-btn" id="settingsBtn" title="Ayarlar">⚙️</button>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="balloon"><div class="bird-grid" id="leftGrid"></div></div>
+  <div class="balloon"><div class="bird-grid" id="rightGrid"></div></div>
+</div>
+
+<div class="numpad" id="numpad"></div>
+
+<div class="feedback" id="feedback"></div>
+<div class="confetti" id="confetti"></div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2>Oyun Ayarları</h2>
+
+    <div class="setting">
+      <label>Hangi hayvan?</label>
+      <select id="animalSelect" class="animal-select"></select>
+    </div>
+
+    <div class="setting">
+      <label>Yerleşim düzeni</label>
+      <div class="seg" id="layoutSeg">
+        <button data-v="random">Düzensiz</button>
+        <button data-v="ordered" class="active">Düzenli (zar)</button>
+      </div>
+    </div>
+
+    <div class="setting">
+      <label>Sol balon — En fazla kaç hayvan?
+        <span class="val" id="leftMaxVal">6</span>
+      </label>
+      <input type="range" min="0" max="10" value="6" id="leftMax">
+    </div>
+
+    <div class="setting">
+      <label>Sağ balon — En fazla kaç hayvan?
+        <span class="val" id="rightMaxVal">1</span>
+      </label>
+      <div class="seg" id="rightSeg">
+        <button data-v="1" class="active">1</button>
+        <button data-v="2">2</button>
+        <button data-v="3">3</button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" id="resetBtn">🔁 Sıfırla</button>
+      <button class="btn-primary" id="saveBtn">Oyna! 🎮</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ANIMALS = [
+    { key: 'bird',      emoji: '🐦', name: 'kuş' },
+    { key: 'chick',     emoji: '🐤', name: 'civciv' },
+    { key: 'duck',      emoji: '🦆', name: 'ördek' },
+    { key: 'owl',       emoji: '🦉', name: 'baykuş' },
+    { key: 'penguin',   emoji: '🐧', name: 'penguen' },
+    { key: 'eagle',     emoji: '🦅', name: 'kartal' },
+    { key: 'parrot',    emoji: '🦜', name: 'papağan' },
+    { key: 'rooster',   emoji: '🐓', name: 'horoz' },
+    { key: 'cat',       emoji: '🐱', name: 'kedi' },
+    { key: 'dog',       emoji: '🐶', name: 'köpek' },
+    { key: 'rabbit',    emoji: '🐰', name: 'tavşan' },
+    { key: 'hamster',   emoji: '🐹', name: 'hamster' },
+    { key: 'mouse',     emoji: '🐭', name: 'fare' },
+    { key: 'cow',       emoji: '🐮', name: 'inek' },
+    { key: 'pig',       emoji: '🐷', name: 'domuz' },
+    { key: 'sheep',     emoji: '🐑', name: 'koyun' },
+    { key: 'horse',     emoji: '🐴', name: 'at' },
+    { key: 'lion',      emoji: '🦁', name: 'aslan' },
+    { key: 'tiger',     emoji: '🐯', name: 'kaplan' },
+    { key: 'bear',      emoji: '🐻', name: 'ayı' },
+    { key: 'panda',     emoji: '🐼', name: 'panda' },
+    { key: 'fox',       emoji: '🦊', name: 'tilki' },
+    { key: 'monkey',    emoji: '🐵', name: 'maymun' },
+    { key: 'elephant',  emoji: '🐘', name: 'fil' },
+    { key: 'giraffe',   emoji: '🦒', name: 'zürafa' },
+    { key: 'zebra',     emoji: '🦓', name: 'zebra' },
+    { key: 'kangaroo',  emoji: '🦘', name: 'kanguru' },
+    { key: 'koala',     emoji: '🐨', name: 'koala' },
+    { key: 'fish',      emoji: '🐠', name: 'balık' },
+    { key: 'octopus',   emoji: '🐙', name: 'ahtapot' },
+    { key: 'whale',     emoji: '🐳', name: 'balina' },
+    { key: 'dolphin',   emoji: '🐬', name: 'yunus' },
+    { key: 'shark',     emoji: '🦈', name: 'köpekbalığı' },
+    { key: 'crab',      emoji: '🦀', name: 'yengeç' },
+    { key: 'turtle',    emoji: '🐢', name: 'kaplumbağa' },
+    { key: 'frog',      emoji: '🐸', name: 'kurbağa' },
+    { key: 'bee',       emoji: '🐝', name: 'arı' },
+    { key: 'butterfly', emoji: '🦋', name: 'kelebek' },
+    { key: 'ladybug',   emoji: '🐞', name: 'uğur böceği' },
+    { key: 'snail',     emoji: '🐌', name: 'salyangoz' },
+    { key: 'ant',       emoji: '🐜', name: 'karınca' },
+    { key: 'trex',      emoji: '🦖', name: 'dinozor' },
+    { key: 'sauropod',  emoji: '🦕', name: 'uzun dinozor' },
+    { key: 'dragon',    emoji: '🐲', name: 'ejderha' },
+    { key: 'unicorn',   emoji: '🦄', name: 'tek boynuzlu at' },
+    // Nokta gösterimleri
+    { key: 'dot_red',    emoji: '🔴', name: 'kırmızı nokta' },
+    { key: 'dot_green',  emoji: '🟢', name: 'yeşil nokta' },
+    { key: 'dot_blue',   emoji: '🔵', name: 'mavi nokta' },
+    { key: 'dot_yellow', emoji: '🟡', name: 'sarı nokta' },
+  ];
+
+  const settings = {
+    animal: 'cat',
+    leftMax: 6,
+    rightMax: 1,
+    layout: 'ordered', // 'random' | 'ordered'
+  };
+
+  let score = { correct: 0, wrong: 0 };
+  let currentAnswer = 0;
+  let answered = false;
+
+  const $ = sel => document.querySelector(sel);
+  const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+  function getAnimal() {
+    return ANIMALS.find(a => a.key === settings.animal) || ANIMALS[0];
+  }
+
+  // Zar düzeni — 1-6 için
+  const DICE_PATTERNS = {
+    1: [[50, 50]],
+    2: [[28, 28], [72, 72]],
+    3: [[25, 25], [50, 50], [75, 75]],
+    4: [[28, 28], [72, 28], [28, 72], [72, 72]],
+    5: [[25, 25], [75, 25], [50, 50], [25, 75], [75, 75]],
+    6: [[28, 22], [72, 22], [28, 50], [72, 50], [28, 78], [72, 78]],
+    // 7 = 6 zar + 1 ortada (alt orta), çocuk "6 + 1" olarak anlasın
+    7: [[25, 18], [75, 18], [25, 45], [75, 45], [25, 72], [75, 72], [50, 90]],
+    // 8 = 4x2 grid (üstte 4, altta 4) — "4 + 4"
+    8: [[15, 30], [38, 30], [62, 30], [85, 30], [15, 70], [38, 70], [62, 70], [85, 70]],
+    // 9 = 3x3 grid — "3 + 3 + 3"
+    9: [[20, 20], [50, 20], [80, 20], [20, 50], [50, 50], [80, 50], [20, 80], [50, 80], [80, 80]],
+    // 10 = 2 satır 5 sütun — "5 + 5"
+    10: [[12, 35], [31, 35], [50, 35], [69, 35], [88, 35], [12, 68], [31, 68], [50, 68], [69, 68], [88, 68]],
+  };
+
+  function orderedPositions(count) {
+    if (count === 0) return [];
+    return DICE_PATTERNS[count] || [];
+  }
+
+  function randomPositions(count) {
+    const positions = [];
+    const minDist = 24;
+    let attempts = 0;
+    while (positions.length < count && attempts < 600) {
+      const x = rand(5, 75);
+      const y = rand(5, 75);
+      const ok = positions.every(p => Math.hypot(p[0] - x, p[1] - y) > minDist);
+      if (ok) positions.push([x, y]);
+      attempts++;
+    }
+    while (positions.length < count) {
+      positions.push([rand(5, 75), rand(5, 75)]);
+    }
+    return positions;
+  }
+
+  function placeAnimals(container, count) {
+    container.innerHTML = '';
+    const emoji = getAnimal().emoji;
+    if (count === 0) return;
+
+    const positions = settings.layout === 'ordered'
+      ? orderedPositions(count)
+      : randomPositions(count);
+
+    positions.forEach((p, i) => {
+      const el = document.createElement('div');
+      el.className = 'bird';
+      el.textContent = emoji;
+      // Düzenli modda merkez hizalama için transform kullan
+      if (settings.layout === 'ordered') {
+        el.style.left = p[0] + '%';
+        el.style.top = p[1] + '%';
+        el.style.transform = 'translate(-50%, -50%)';
+        el.style.transformOrigin = 'center';
+      } else {
+        el.style.left = p[0] + '%';
+        el.style.top = p[1] + '%';
+      }
+      el.style.animationDelay = `${i * 0.08}s`;
+      container.appendChild(el);
+    });
+  }
+
+  function newRound() {
+    answered = false;
+    const left  = rand(0, settings.leftMax);
+    const right = rand(0, settings.rightMax);
+    currentAnswer = left + right;
+
+    placeAnimals($('#leftGrid'), left);
+    placeAnimals($('#rightGrid'), right);
+
+    document.querySelectorAll('.num:not(.num-refresh)').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('correct', 'wrong');
+    });
+  }
+
+  function buildNumpad() {
+    const pad = $('#numpad');
+    pad.innerHTML = '';
+    const maxSum = settings.leftMax + settings.rightMax;
+    for (let i = 0; i <= maxSum; i++) {
+      const b = document.createElement('button');
+      b.className = 'num';
+      b.textContent = i;
+      b.dataset.v = i;
+      b.addEventListener('click', () => onAnswer(i, b));
+      pad.appendChild(b);
+    }
+    // Yenile butonu (turuncu)
+    const refresh = document.createElement('button');
+    refresh.className = 'num num-refresh';
+    refresh.id = 'refreshBtn';
+    refresh.innerHTML = '🔄';
+    refresh.title = 'Yeni Oyun';
+    refresh.addEventListener('click', newRound);
+    pad.appendChild(refresh);
+  }
+
+  function onAnswer(value, btn) {
+    if (answered) return;
+
+    if (value === currentAnswer) {
+      answered = true;
+      btn.classList.add('correct');
+      score.correct++;
+      $('#scoreCorrect').textContent = score.correct;
+      showFeedback('Harika! 🎉', 'good');
+      launchConfetti();
+      setTimeout(newRound, 1400);
+    } else {
+      btn.classList.add('wrong');
+      btn.disabled = true;
+      score.wrong++;
+      $('#scoreWrong').textContent = score.wrong;
+      showFeedback('Tekrar dene!', 'bad');
+    }
+  }
+
+  function showFeedback(text, type) {
+    const f = $('#feedback');
+    f.textContent = text;
+    f.className = 'feedback show ' + type;
+    setTimeout(() => f.classList.remove('show'), 1100);
+  }
+
+  function launchConfetti() {
+    const colors = ['#ff5a5a', '#34c759', '#ffd84a', '#5da9e8', '#e8470c', '#a855f7'];
+    const layer = $('#confetti');
+    for (let i = 0; i < 40; i++) {
+      const c = document.createElement('span');
+      c.style.left = Math.random() * 100 + '%';
+      c.style.background = colors[Math.floor(Math.random() * colors.length)];
+      c.style.animationDuration = (1.5 + Math.random() * 1.5) + 's';
+      c.style.animationDelay = (Math.random() * 0.3) + 's';
+      c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+      c.style.transform = `rotate(${Math.random() * 360}deg)`;
+      layer.appendChild(c);
+      setTimeout(() => c.remove(), 3500);
+    }
+  }
+
+  function buildAnimalPicker() {
+    const sel = $('#animalSelect');
+    sel.innerHTML = '';
+    ANIMALS.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a.key;
+      opt.textContent = `${a.emoji}  ${a.name.charAt(0).toUpperCase() + a.name.slice(1)}`;
+      if (a.key === settings.animal) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', e => {
+      settings.animal = e.target.value;
+    });
+  }
+
+  function openSettings() {
+    $('#leftMax').value = settings.leftMax;
+    $('#leftMaxVal').textContent = settings.leftMax;
+    $('#rightSeg').querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', +b.dataset.v === settings.rightMax);
+    });
+    $('#rightMaxVal').textContent = settings.rightMax;
+    $('#layoutSeg').querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.dataset.v === settings.layout);
+    });
+    $('#animalSelect').value = settings.animal;
+    $('#modalBg').classList.add('show');
+  }
+
+  function closeSettings() {
+    $('#modalBg').classList.remove('show');
+  }
+
+  $('#settingsBtn').addEventListener('click', openSettings);
+
+  $('#leftMax').addEventListener('input', e => {
+    settings.leftMax = +e.target.value;
+    $('#leftMaxVal').textContent = settings.leftMax;
+  });
+
+  $('#rightSeg').querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      settings.rightMax = +b.dataset.v;
+      $('#rightMaxVal').textContent = settings.rightMax;
+      $('#rightSeg').querySelectorAll('button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+  });
+
+  $('#layoutSeg').querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      settings.layout = b.dataset.v;
+      $('#layoutSeg').querySelectorAll('button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+  });
+
+  $('#saveBtn').addEventListener('click', () => {
+    closeSettings();
+    buildNumpad();
+    newRound();
+  });
+
+  $('#resetBtn').addEventListener('click', () => {
+    score.correct = 0;
+    score.wrong = 0;
+    $('#scoreCorrect').textContent = 0;
+    $('#scoreWrong').textContent = 0;
+    closeSettings();
+    buildNumpad();
+    newRound();
+  });
+
+  document.addEventListener('keydown', e => {
+    if ($('#modalBg').classList.contains('show')) return;
+    const maxSum = settings.leftMax + settings.rightMax;
+    const n = parseInt(e.key);
+    if (!isNaN(n) && n >= 0 && n <= maxSum) {
+      const btn = document.querySelector(`.num[data-v="${n}"]`);
+      if (btn && !btn.disabled) onAnswer(n, btn);
+    }
+  });
+
+  buildAnimalPicker();
+  buildNumpad();
+  newRound();
+</script>
+
+</body>
+</html>
