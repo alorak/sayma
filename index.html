@@ -129,6 +129,28 @@
   .pill.correct { background: #e8fae3; }
   .pill.wrong { background: #ffe5e5; }
 
+  .ui-icon {
+    width: 1.15em;
+    height: 1.15em;
+    display: inline-block;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .pill .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .icon-btn .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+
   .icon-btn {
     background: #fff;
     border: 3px solid var(--ink);
@@ -261,6 +283,12 @@
     background: linear-gradient(180deg, #ff8a3d, #e8470c);
     margin-left: 10px;
     font-size: 30px;
+    display: grid;
+    place-items: center;
+  }
+  .num.num-refresh .ui-icon {
+    width: 34px;
+    height: 34px;
   }
   .num.num-refresh:disabled {
     opacity: 1; /* Yenile butonu hiç devre dışı kalmasın */
@@ -407,6 +435,16 @@
     gap: 12px;
     margin-top: 24px;
   }
+  .modal .actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+  }
+  .modal .actions .ui-icon {
+    width: 21px;
+    height: 21px;
+  }
   .btn-primary {
     flex: 1;
     background: linear-gradient(180deg, #ff8a3d, #e8470c);
@@ -442,14 +480,15 @@
   .btn-secondary:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
 
   .animal-select {
-    width: 100%;
+    width: 104px;
+    height: 62px;
     background: #fff;
     border: 3px solid var(--ink);
     border-radius: 14px;
-    padding: 12px 16px;
+    padding: 6px 34px 6px 10px;
     font-family: 'Fredoka', sans-serif;
-    font-size: 18px;
-    font-weight: 500;
+    font-size: 32px;
+    line-height: 1;
     color: var(--ink);
     cursor: pointer;
     box-shadow: 0 4px 0 var(--ink);
@@ -457,8 +496,13 @@
     -webkit-appearance: none;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'><path fill='%231f3a5f' d='M2 5l5 5 5-5z'/></svg>");
     background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 42px;
+    background-position: right 12px center;
+    text-align: center;
+    text-align-last: center;
+  }
+  .animal-select option {
+    font-size: 28px;
+    text-align: center;
   }
   .animal-select:focus {
     outline: none;
@@ -502,9 +546,20 @@
 <div class="topbar">
   <div class="logo">Hayvanları <span class="em">Sayalım!</span></div>
   <div class="scorebar">
-    <div class="pill correct">✅ <span id="scoreCorrect">0</span></div>
-    <div class="pill wrong">❌ <span id="scoreWrong">0</span></div>
-    <button class="icon-btn" id="settingsBtn" title="Ayarlar">⚙️</button>
+    <div class="pill correct">
+      <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+      <span id="scoreCorrect">0</span>
+    </div>
+    <div class="pill wrong">
+      <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m18 6-12 12M6 6l12 12"/></svg>
+      <span id="scoreWrong">0</span>
+    </div>
+    <button class="icon-btn" id="settingsBtn" title="Ayarlar" aria-label="Ayarlar">
+      <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.1 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H2.3V9.6h.1A1.7 1.7 0 0 0 4.1 8.5a1.7 1.7 0 0 0-.34-1.88L3.7 6.56l2.83-2.83.06.06A1.7 1.7 0 0 0 8.5 4.1a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V2.3h4v.1A1.7 1.7 0 0 0 15 4.1a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 8.5a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.1.4h.1v4h-.1a1.7 1.7 0 0 0-1.7 1.1Z"/>
+      </svg>
+    </button>
   </div>
 </div>
 
@@ -554,8 +609,14 @@
     </div>
 
     <div class="actions">
-      <button class="btn-secondary" id="resetBtn">🔁 Sıfırla</button>
-      <button class="btn-primary" id="saveBtn">Oyna! 🎮</button>
+      <button class="btn-secondary" id="resetBtn">
+        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        Sıfırla
+      </button>
+      <button class="btn-primary" id="saveBtn">
+        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7Z"/></svg>
+        Oyna!
+      </button>
     </div>
   </div>
 </div>
@@ -570,6 +631,12 @@
     { key: 'eagle',     emoji: '🦅', name: 'kartal' },
     { key: 'parrot',    emoji: '🦜', name: 'papağan' },
     { key: 'rooster',   emoji: '🐓', name: 'horoz' },
+    { key: 'turkey',    emoji: '🦃', name: 'hindi' },
+    { key: 'swan',      emoji: '🦢', name: 'kuğu' },
+    { key: 'goose',     emoji: '🪿', name: 'kaz' },
+    { key: 'peacock',   emoji: '🦚', name: 'tavus kuşu' },
+    { key: 'flamingo',  emoji: '🦩', name: 'flamingo' },
+    { key: 'dove',      emoji: '🕊️', name: 'güvercin' },
     { key: 'cat',       emoji: '🐱', name: 'kedi' },
     { key: 'dog',       emoji: '🐶', name: 'köpek' },
     { key: 'rabbit',    emoji: '🐰', name: 'tavşan' },
@@ -590,12 +657,34 @@
     { key: 'zebra',     emoji: '🦓', name: 'zebra' },
     { key: 'kangaroo',  emoji: '🦘', name: 'kanguru' },
     { key: 'koala',     emoji: '🐨', name: 'koala' },
+    { key: 'raccoon',   emoji: '🦝', name: 'rakun' },
+    { key: 'deer',      emoji: '🦌', name: 'geyik' },
+    { key: 'goat',      emoji: '🐐', name: 'keçi' },
+    { key: 'ox',        emoji: '🐂', name: 'öküz' },
+    { key: 'buffalo',   emoji: '🐃', name: 'manda' },
+    { key: 'camel',     emoji: '🐪', name: 'deve' },
+    { key: 'llama',     emoji: '🦙', name: 'lama' },
+    { key: 'hippo',     emoji: '🦛', name: 'su aygırı' },
+    { key: 'rhino',     emoji: '🦏', name: 'gergedan' },
+    { key: 'sloth',     emoji: '🦥', name: 'tembel hayvan' },
+    { key: 'otter',     emoji: '🦦', name: 'su samuru' },
+    { key: 'skunk',     emoji: '🦨', name: 'kokarca' },
+    { key: 'badger',    emoji: '🦡', name: 'porsuk' },
+    { key: 'beaver',    emoji: '🦫', name: 'kunduz' },
+    { key: 'squirrel',  emoji: '🐿️', name: 'sincap' },
+    { key: 'bat',       emoji: '🦇', name: 'yarasa' },
     { key: 'fish',      emoji: '🐠', name: 'balık' },
     { key: 'octopus',   emoji: '🐙', name: 'ahtapot' },
     { key: 'whale',     emoji: '🐳', name: 'balina' },
     { key: 'dolphin',   emoji: '🐬', name: 'yunus' },
     { key: 'shark',     emoji: '🦈', name: 'köpekbalığı' },
     { key: 'crab',      emoji: '🦀', name: 'yengeç' },
+    { key: 'lobster',   emoji: '🦞', name: 'ıstakoz' },
+    { key: 'shrimp',    emoji: '🦐', name: 'karides' },
+    { key: 'squid',     emoji: '🦑', name: 'kalamar' },
+    { key: 'jellyfish', emoji: '🪼', name: 'denizanası' },
+    { key: 'blowfish',  emoji: '🐡', name: 'balon balığı' },
+    { key: 'seal',      emoji: '🦭', name: 'fok' },
     { key: 'turtle',    emoji: '🐢', name: 'kaplumbağa' },
     { key: 'frog',      emoji: '🐸', name: 'kurbağa' },
     { key: 'bee',       emoji: '🐝', name: 'arı' },
@@ -603,6 +692,11 @@
     { key: 'ladybug',   emoji: '🐞', name: 'uğur böceği' },
     { key: 'snail',     emoji: '🐌', name: 'salyangoz' },
     { key: 'ant',       emoji: '🐜', name: 'karınca' },
+    { key: 'beetle',    emoji: '🪲', name: 'böcek' },
+    { key: 'cricket',   emoji: '🦗', name: 'cırcır böceği' },
+    { key: 'spider',    emoji: '🕷️', name: 'örümcek' },
+    { key: 'scorpion',  emoji: '🦂', name: 'akrep' },
+    { key: 'worm',      emoji: '🪱', name: 'solucan' },
     { key: 'trex',      emoji: '🦖', name: 'dinozor' },
     { key: 'sauropod',  emoji: '🦕', name: 'uzun dinozor' },
     { key: 'dragon',    emoji: '🐲', name: 'ejderha' },
@@ -731,8 +825,9 @@
     const refresh = document.createElement('button');
     refresh.className = 'num num-refresh';
     refresh.id = 'refreshBtn';
-    refresh.innerHTML = '🔄';
+    refresh.innerHTML = '<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66"/><path d="M20 4v7h-7"/></svg>';
     refresh.title = 'Yeni Oyun';
+    refresh.setAttribute('aria-label', 'Yeni Oyun');
     refresh.addEventListener('click', newRound);
     pad.appendChild(refresh);
   }
@@ -745,7 +840,7 @@
       btn.classList.add('correct');
       score.correct++;
       $('#scoreCorrect').textContent = score.correct;
-      showFeedback('Harika! 🎉', 'good');
+      showFeedback('Harika!', 'good');
       launchConfetti();
       setTimeout(newRound, 1400);
     } else {
@@ -786,7 +881,9 @@
     ANIMALS.forEach(a => {
       const opt = document.createElement('option');
       opt.value = a.key;
-      opt.textContent = `${a.emoji}  ${a.name.charAt(0).toUpperCase() + a.name.slice(1)}`;
+      opt.textContent = a.emoji;
+      opt.label = a.name;
+      opt.title = a.name;
       if (a.key === settings.animal) opt.selected = true;
       sel.appendChild(opt);
     });
