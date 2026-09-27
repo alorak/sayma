@@ -129,6 +129,28 @@
   .pill.correct { background: #e8fae3; }
   .pill.wrong { background: #ffe5e5; }
 
+  .ui-icon {
+    width: 1.15em;
+    height: 1.15em;
+    display: inline-block;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .pill .ui-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .icon-btn .ui-icon {
+    width: 24px;
+    height: 24px;
+  }
+
   .icon-btn {
     background: #fff;
     border: 3px solid var(--ink);
@@ -207,22 +229,22 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 8px;
-    padding: 14px 16px 22px;
+    gap: 12px;
+    padding: 18px 16px 26px;
   }
 
   .num {
-    width: 54px;
-    height: 54px;
-    border-radius: 14px;
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
     border: 3px solid var(--ink);
     background: linear-gradient(180deg, #5da9e8, #3d86c2);
     color: #fff;
     font-family: 'Fredoka', sans-serif;
-    font-size: 24px;
+    font-size: 34px;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 5px 0 var(--ink);
+    box-shadow: 0 6px 0 var(--ink);
     transition: transform 0.1s, box-shadow 0.1s, background 0.2s;
     text-shadow: 0 2px 0 rgba(0,0,0,0.15);
   }
@@ -259,8 +281,14 @@
 
   .num.num-refresh {
     background: linear-gradient(180deg, #ff8a3d, #e8470c);
-    margin-left: 8px;
-    font-size: 22px;
+    margin-left: 10px;
+    font-size: 30px;
+    display: grid;
+    place-items: center;
+  }
+  .num.num-refresh .ui-icon {
+    width: 34px;
+    height: 34px;
   }
   .num.num-refresh:disabled {
     opacity: 1; /* Yenile butonu hiç devre dışı kalmasın */
@@ -407,6 +435,16 @@
     gap: 12px;
     margin-top: 24px;
   }
+  .modal .actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+  }
+  .modal .actions .ui-icon {
+    width: 21px;
+    height: 21px;
+  }
   .btn-primary {
     flex: 1;
     background: linear-gradient(180deg, #ff8a3d, #e8470c);
@@ -441,35 +479,98 @@
   .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 7px 0 var(--ink); }
   .btn-secondary:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--ink); }
 
-  .animal-select {
-    width: 100%;
-    background: #fff;
-    border: 3px solid var(--ink);
-    border-radius: 14px;
-    padding: 12px 16px;
-    font-family: 'Fredoka', sans-serif;
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--ink);
-    cursor: pointer;
-    box-shadow: 0 4px 0 var(--ink);
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'><path fill='%231f3a5f' d='M2 5l5 5 5-5z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 42px;
+  .animal-picker {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 9px;
+    max-height: 252px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(255,255,255,0.68);
+    border: 2px solid rgba(31, 58, 95, 0.18);
+    border-radius: 18px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(31, 58, 95, 0.45) transparent;
   }
-  .animal-select:focus {
-    outline: none;
+  .animal-picker::-webkit-scrollbar {
+    width: 8px;
+  }
+  .animal-picker::-webkit-scrollbar-thumb {
+    background: rgba(31, 58, 95, 0.38);
+    border-radius: 999px;
+  }
+  .animal-choice {
+    position: relative;
+    min-width: 0;
+    aspect-ratio: 1;
+    border: 2px solid rgba(31, 58, 95, 0.2);
+    border-radius: 16px;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    font-size: clamp(30px, 4vw, 38px);
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(31, 58, 95, 0.22);
+    transition: transform 0.12s, box-shadow 0.12s, border-color 0.12s, background 0.12s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .animal-choice:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 0 rgba(31, 58, 95, 0.24);
+    border-color: rgba(31, 58, 95, 0.45);
+  }
+  .animal-choice:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 0 rgba(31, 58, 95, 0.24);
+  }
+  .animal-choice:focus-visible {
+    outline: 3px solid #ff8a3d;
+    outline-offset: 2px;
+  }
+  .animal-choice.selected {
+    background: #fff3e7;
+    border-color: #e8470c;
+    box-shadow: 0 4px 0 #e8470c;
     transform: translateY(-1px);
-    box-shadow: 0 5px 0 var(--ink);
+  }
+  .animal-choice.selected::after {
+    content: '✓';
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--ink);
+    color: #fff;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .animal-picker-help {
+    margin-top: 7px;
+    color: var(--ink-soft);
+    font-size: 12px;
   }
 
   @media (max-width: 720px) {
-    .num { width: 44px; height: 44px; font-size: 20px; }
+    .num { width: 58px; height: 58px; font-size: 28px; }
     .logo { font-size: 28px; }
     .pill { font-size: 15px; padding: 6px 12px; }
+    .animal-picker { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 440px) {
+    .animal-picker {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      max-height: 228px;
+    }
+    .animal-choice { border-radius: 14px; }
   }
 
   /* Yatay mod / kısa ekranlar — yüksekliğe göre sıkıştır */
@@ -479,15 +580,15 @@
     .pill { font-size: 14px; padding: 5px 12px; }
     .icon-btn { width: 40px; height: 40px; font-size: 18px; }
     .stage { gap: 14px; padding-top: 0; }
-    .numpad { padding: 8px 16px 12px; gap: 6px; }
-    .num { width: 42px; height: 42px; font-size: 18px; }
+    .numpad { padding: 10px 16px 14px; gap: 8px; }
+    .num { width: 56px; height: 56px; font-size: 27px; }
   }
 
   @media (max-height: 480px) {
     .topbar { padding: 6px 14px; }
     .stage { gap: 10px; }
-    .numpad { padding: 6px 12px 10px; gap: 5px; }
-    .num { width: 36px; height: 36px; font-size: 16px; border-width: 2px; box-shadow: 0 3px 0 var(--ink); }
+    .numpad { padding: 8px 12px 10px; gap: 6px; }
+    .num { width: 48px; height: 48px; font-size: 24px; border-width: 2px; box-shadow: 0 4px 0 var(--ink); }
     .pill { font-size: 13px; padding: 4px 10px; }
   }
 </style>
@@ -502,9 +603,20 @@
 <div class="topbar">
   <div class="logo">Hayvanları <span class="em">Sayalım!</span></div>
   <div class="scorebar">
-    <div class="pill correct">✅ <span id="scoreCorrect">0</span></div>
-    <div class="pill wrong">❌ <span id="scoreWrong">0</span></div>
-    <button class="icon-btn" id="settingsBtn" title="Ayarlar">⚙️</button>
+    <div class="pill correct">
+      <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+      <span id="scoreCorrect">0</span>
+    </div>
+    <div class="pill wrong">
+      <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m18 6-12 12M6 6l12 12"/></svg>
+      <span id="scoreWrong">0</span>
+    </div>
+    <button class="icon-btn" id="settingsBtn" title="Ayarlar" aria-label="Ayarlar">
+      <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.1 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H2.3V9.6h.1A1.7 1.7 0 0 0 4.1 8.5a1.7 1.7 0 0 0-.34-1.88L3.7 6.56l2.83-2.83.06.06A1.7 1.7 0 0 0 8.5 4.1a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V2.3h4v.1A1.7 1.7 0 0 0 15 4.1a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 8.5a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.1.4h.1v4h-.1a1.7 1.7 0 0 0-1.7 1.1Z"/>
+      </svg>
+    </button>
   </div>
 </div>
 
@@ -523,8 +635,9 @@
     <h2>Oyun Ayarları</h2>
 
     <div class="setting">
-      <label>Hangi hayvan?</label>
-      <select id="animalSelect" class="animal-select"></select>
+      <label id="animalPickerLabel">Hayvanını seç</label>
+      <div class="animal-picker" id="animalPicker" role="radiogroup" aria-labelledby="animalPickerLabel"></div>
+      <div class="animal-picker-help">Bir hayvana dokun — seçili hayvan turuncu çerçeveyle gösterilir.</div>
     </div>
 
     <div class="setting">
@@ -554,8 +667,14 @@
     </div>
 
     <div class="actions">
-      <button class="btn-secondary" id="resetBtn">🔁 Sıfırla</button>
-      <button class="btn-primary" id="saveBtn">Oyna! 🎮</button>
+      <button class="btn-secondary" id="resetBtn">
+        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        Sıfırla
+      </button>
+      <button class="btn-primary" id="saveBtn">
+        <svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7Z"/></svg>
+        Oyna!
+      </button>
     </div>
   </div>
 </div>
@@ -570,6 +689,12 @@
     { key: 'eagle',     emoji: '🦅', name: 'kartal' },
     { key: 'parrot',    emoji: '🦜', name: 'papağan' },
     { key: 'rooster',   emoji: '🐓', name: 'horoz' },
+    { key: 'turkey',    emoji: '🦃', name: 'hindi' },
+    { key: 'swan',      emoji: '🦢', name: 'kuğu' },
+    { key: 'goose',     emoji: '🪿', name: 'kaz' },
+    { key: 'peacock',   emoji: '🦚', name: 'tavus kuşu' },
+    { key: 'flamingo',  emoji: '🦩', name: 'flamingo' },
+    { key: 'dove',      emoji: '🕊️', name: 'güvercin' },
     { key: 'cat',       emoji: '🐱', name: 'kedi' },
     { key: 'dog',       emoji: '🐶', name: 'köpek' },
     { key: 'rabbit',    emoji: '🐰', name: 'tavşan' },
@@ -590,19 +715,49 @@
     { key: 'zebra',     emoji: '🦓', name: 'zebra' },
     { key: 'kangaroo',  emoji: '🦘', name: 'kanguru' },
     { key: 'koala',     emoji: '🐨', name: 'koala' },
+    { key: 'raccoon',   emoji: '🦝', name: 'rakun' },
+    { key: 'deer',      emoji: '🦌', name: 'geyik' },
+    { key: 'goat',      emoji: '🐐', name: 'keçi' },
+    { key: 'ox',        emoji: '🐂', name: 'öküz' },
+    { key: 'buffalo',   emoji: '🐃', name: 'manda' },
+    { key: 'camel',     emoji: '🐪', name: 'deve' },
+    { key: 'llama',     emoji: '🦙', name: 'lama' },
+    { key: 'hippo',     emoji: '🦛', name: 'su aygırı' },
+    { key: 'rhino',     emoji: '🦏', name: 'gergedan' },
+    { key: 'sloth',     emoji: '🦥', name: 'tembel hayvan' },
+    { key: 'otter',     emoji: '🦦', name: 'su samuru' },
+    { key: 'skunk',     emoji: '🦨', name: 'kokarca' },
+    { key: 'badger',    emoji: '🦡', name: 'porsuk' },
+    { key: 'beaver',    emoji: '🦫', name: 'kunduz' },
+    { key: 'squirrel',  emoji: '🐿️', name: 'sincap' },
+    { key: 'bat',       emoji: '🦇', name: 'yarasa' },
     { key: 'fish',      emoji: '🐠', name: 'balık' },
     { key: 'octopus',   emoji: '🐙', name: 'ahtapot' },
     { key: 'whale',     emoji: '🐳', name: 'balina' },
     { key: 'dolphin',   emoji: '🐬', name: 'yunus' },
     { key: 'shark',     emoji: '🦈', name: 'köpekbalığı' },
     { key: 'crab',      emoji: '🦀', name: 'yengeç' },
+    { key: 'lobster',   emoji: '🦞', name: 'ıstakoz' },
+    { key: 'shrimp',    emoji: '🦐', name: 'karides' },
+    { key: 'squid',     emoji: '🦑', name: 'kalamar' },
+    { key: 'jellyfish', emoji: '🪼', name: 'denizanası' },
+    { key: 'blowfish',  emoji: '🐡', name: 'balon balığı' },
+    { key: 'seal',      emoji: '🦭', name: 'fok' },
     { key: 'turtle',    emoji: '🐢', name: 'kaplumbağa' },
+    { key: 'crocodile', emoji: '🐊', name: 'timsah' },
+    { key: 'lizard',    emoji: '🦎', name: 'kertenkele' },
+    { key: 'snake',     emoji: '🐍', name: 'yılan' },
     { key: 'frog',      emoji: '🐸', name: 'kurbağa' },
     { key: 'bee',       emoji: '🐝', name: 'arı' },
     { key: 'butterfly', emoji: '🦋', name: 'kelebek' },
     { key: 'ladybug',   emoji: '🐞', name: 'uğur böceği' },
     { key: 'snail',     emoji: '🐌', name: 'salyangoz' },
     { key: 'ant',       emoji: '🐜', name: 'karınca' },
+    { key: 'beetle',    emoji: '🪲', name: 'böcek' },
+    { key: 'cricket',   emoji: '🦗', name: 'cırcır böceği' },
+    { key: 'spider',    emoji: '🕷️', name: 'örümcek' },
+    { key: 'scorpion',  emoji: '🦂', name: 'akrep' },
+    { key: 'worm',      emoji: '🪱', name: 'solucan' },
     { key: 'trex',      emoji: '🦖', name: 'dinozor' },
     { key: 'sauropod',  emoji: '🦕', name: 'uzun dinozor' },
     { key: 'dragon',    emoji: '🐲', name: 'ejderha' },
@@ -731,8 +886,9 @@
     const refresh = document.createElement('button');
     refresh.className = 'num num-refresh';
     refresh.id = 'refreshBtn';
-    refresh.innerHTML = '🔄';
+    refresh.innerHTML = '<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66"/><path d="M20 4v7h-7"/></svg>';
     refresh.title = 'Yeni Oyun';
+    refresh.setAttribute('aria-label', 'Yeni Oyun');
     refresh.addEventListener('click', newRound);
     pad.appendChild(refresh);
   }
@@ -745,7 +901,7 @@
       btn.classList.add('correct');
       score.correct++;
       $('#scoreCorrect').textContent = score.correct;
-      showFeedback('Harika! 🎉', 'good');
+      showFeedback('Harika!', 'good');
       launchConfetti();
       setTimeout(newRound, 1400);
     } else {
@@ -780,19 +936,54 @@
     }
   }
 
+  function syncAnimalPicker() {
+    document.querySelectorAll('.animal-choice').forEach(btn => {
+      const selected = btn.dataset.animal === settings.animal;
+      btn.classList.toggle('selected', selected);
+      btn.setAttribute('aria-checked', selected ? 'true' : 'false');
+      btn.tabIndex = selected ? 0 : -1;
+    });
+  }
+
   function buildAnimalPicker() {
-    const sel = $('#animalSelect');
-    sel.innerHTML = '';
+    const picker = $('#animalPicker');
+    picker.innerHTML = '';
+
     ANIMALS.forEach(a => {
-      const opt = document.createElement('option');
-      opt.value = a.key;
-      opt.textContent = `${a.emoji}  ${a.name.charAt(0).toUpperCase() + a.name.slice(1)}`;
-      if (a.key === settings.animal) opt.selected = true;
-      sel.appendChild(opt);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'animal-choice';
+      btn.dataset.animal = a.key;
+      btn.textContent = a.emoji;
+      btn.title = a.name;
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-label', a.name);
+      btn.setAttribute('aria-checked', 'false');
+
+      btn.addEventListener('click', () => {
+        settings.animal = a.key;
+        syncAnimalPicker();
+      });
+
+      btn.addEventListener('keydown', e => {
+        if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
+        e.preventDefault();
+
+        const buttons = [...picker.querySelectorAll('.animal-choice')];
+        const current = buttons.indexOf(btn);
+        const columns = getComputedStyle(picker).gridTemplateColumns.split(' ').length;
+        const delta = e.key === 'ArrowRight' ? 1
+          : e.key === 'ArrowLeft' ? -1
+          : e.key === 'ArrowDown' ? columns
+          : -columns;
+        const next = Math.max(0, Math.min(buttons.length - 1, current + delta));
+        buttons[next].focus();
+      });
+
+      picker.appendChild(btn);
     });
-    sel.addEventListener('change', e => {
-      settings.animal = e.target.value;
-    });
+
+    syncAnimalPicker();
   }
 
   function openSettings() {
@@ -805,7 +996,7 @@
     $('#layoutSeg').querySelectorAll('button').forEach(b => {
       b.classList.toggle('active', b.dataset.v === settings.layout);
     });
-    $('#animalSelect').value = settings.animal;
+    syncAnimalPicker();
     $('#modalBg').classList.add('show');
   }
 
