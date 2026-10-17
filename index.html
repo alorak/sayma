@@ -986,7 +986,10 @@
     syncAnimalPicker();
   }
 
+  let settingsBeforeOpen = null;
+
   function openSettings() {
+    settingsBeforeOpen = { ...settings };
     $('#leftMax').value = settings.leftMax;
     $('#leftMaxVal').textContent = settings.leftMax;
     $('#rightSeg').querySelectorAll('button').forEach(b => {
@@ -1000,11 +1003,16 @@
     $('#modalBg').classList.add('show');
   }
 
-  function closeSettings() {
+  function closeSettings({ cancel = false } = {}) {
+    if (cancel && settingsBeforeOpen) Object.assign(settings, settingsBeforeOpen);
+    settingsBeforeOpen = null;
     $('#modalBg').classList.remove('show');
   }
 
   $('#settingsBtn').addEventListener('click', openSettings);
+  $('#modalBg').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeSettings({ cancel: true });
+  });
 
   $('#leftMax').addEventListener('input', e => {
     settings.leftMax = +e.target.value;
@@ -1045,7 +1053,13 @@
   });
 
   document.addEventListener('keydown', e => {
-    if ($('#modalBg').classList.contains('show')) return;
+    if ($('#modalBg').classList.contains('show')) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeSettings({ cancel: true });
+      }
+      return;
+    }
     const maxSum = settings.leftMax + settings.rightMax;
     const n = parseInt(e.key);
     if (!isNaN(n) && n >= 0 && n <= maxSum) {
